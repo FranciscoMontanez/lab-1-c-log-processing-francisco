@@ -5,7 +5,7 @@ path=$(pwd)
 cd $1
 
 #Using for loop to obtain data from failed_login_data.txt in each subdirectory
-#and printing userNames using awk then merging
+#and printing userNames using awk
 for subfolder in */ ; do
          cd "$subfolder"
          sort -k 4  failed_login_data.txt | awk '{print $4}' > result.txt        
