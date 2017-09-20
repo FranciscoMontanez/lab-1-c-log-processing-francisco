@@ -15,7 +15,7 @@ for subfolder in */ ; do
 done;
 
 #Sorts the data on userNameResult.txt onto usernameResult.txt
-sort  userNameResult.txt |uniq -c | awk '{print "data.addRow([""\x27"$2"\x27"",",$1"]);"}' > usernameResult.txt
+sort userNameResult.txt |uniq -c | awk '{print "data.addRow([""\x27"$2"\x27"",",$1"]);"}' > usernameResult.txt
 
 #Removing unsorted temp file
 rm userNameResult.txt
@@ -25,8 +25,6 @@ mv usernameResult.txt ..
 cd ..
 
 #Wrapping contents of usernameResult.txt to create html file
-wrap_contents.sh usernameResult.txt html_components/username_dist $path/username_dist.html
+./wrap_contents.sh usernameResult.txt html_components/username_dist/username_dist.html
 
 rm usernameResult.txt
-
-
