@@ -1,37 +1,41 @@
 #!/bin/bash
+  
 
-originalPath=$(pwd)
+TEMP_DIR="/tmp/temp_dir"
 
-mkdir temp
+#Silently create the temp directory
+mkdir "$TEMP_DIR"  2>/dev/null
 
-for f in $@ ; do
 
-        NAME=$(basename $f)
+for TAR_FILE in $*;
+do
+    #Get the name of the file minus _secure.tgz
+    #for instance zeus_secure.tgz
+    #becomes      zeus
+    TAR_NAME=`basename --suffix=_secure.tgz $TAR_FILE `
 
-        FILENAME=$(echo $NAME | sed 's/_secure.tgz//g')
+    #Extract the contents of each of the tar files
+    #into new directories with the names determined above
 
-        mkdir temp/"$FILENAME"
+    mkdir "$TEMP_DIR/$TAR_NAME"
+    tar -xf "$TAR_FILE" --directory "$TEMP_DIR/$TAR_NAME";
 
-        cd temp
-
-        cd "$FILENAME"
-
-        tar -xf ../../log_files/$NAME
-
-        cd ..
-
-        cd ..
-
-        process_client_logs.sh $FILENAME
+    #Create failed_login_data.txt for each of the systems
+    bin/process_client_logs.sh "$TEMP_DIR/$TAR_NAME"
 
 done;
 
-create_username_dist.sh temp 
+#Create javascript files with HTML headers/footers
+bin/create_username_dist.sh "$TEMP_DIR"
+bin/create_hours_dist.sh "$TEMP_DIR"
+bin/create_country_dist.sh "$TEMP_DIR"
 
-create_hours_dist.sh temp
+#Assemble javascript into html file
+bin/assemble_report.sh "$TEMP_DIR"
 
-create_country_dist.sh temp
+#Move the resulting summary to the working directory
+mv "$TEMP_DIR/failed_login_summary.html" .
 
-assemble_report.sh temp
+#Clean up temporary files
+rm -r "$TEMP_DIR"
 
-rm -r temp

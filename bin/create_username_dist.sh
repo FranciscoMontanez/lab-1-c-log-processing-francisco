@@ -1,30 +1,14 @@
 #!/bin/bash
+  
+# each sub-dir has failed_login_data.txt
+USERNAME_DIR=$1
 
-path=$(pwd)
+# 1. grab all the unique user names
+# 2. count the number of occurences of each unique username
+# 3. put it in data.addRow(['username', occurences]);
+ALL_SUBDIRS_FILES=`ls -d $USERNAME_DIR/*/failed_login_data.txt`
+cat $ALL_SUBDIRS_FILES | awk '{print $4;}' | sort | uniq --count | awk '{print "data.addRow([\x27"$2"\x27, "$1"]);";}' > username_data.js
 
-cd $1
-
-#Using for loop to obtain data from failed_login_data.txt in each subdirectory
-#and printing userNames using awk
-for subfolder in */ ; do
-         cd "$subfolder"
-         sort -k 4  failed_login_data.txt | awk '{print $4}' > result.txt        
-         cat result.txt >> ../userNameResult.txt
-         rm result.txt
-         cd ..
-done;
-
-#Sorts the data on userNameResult.txt onto usernameResult.txt
-sort userNameResult.txt |uniq -c | awk '{print "data.addRow([""\x27"$2"\x27"",",$1"]);"}' > usernameResult.txt
-
-#Removing unsorted temp file
-rm userNameResult.txt
-
-#Moving sorted temp file to directory
-mv usernameResult.txt ..
-cd ..
-
-#Wrapping contents of usernameResult.txt to create html file
-./wrap_contents.sh usernameResult.txt html_components/username_dist/username_dist.html
-
-rm usernameResult.txt
+bin/wrap_contents.sh username_data.js html_components/username_dist $USERNAME_DIR/username_dist.html
+# Remove the temp file
+rm username_data.js

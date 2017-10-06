@@ -1,15 +1,14 @@
 #!/bin/bash
+  
+DIST_DIR=$1
 
-Path=$(find . -name "$1" -print)
+#Concatenate the files together into one dist html file
+cat $DIST_DIR/{country_dist,hours_dist,username_dist}.html > concat_dist.html
 
-cd "$Path"
+#Create final summary html
+bin/wrap_contents.sh concat_dist.html html_components/summary_plots $1/failed_login_summary.html
 
-cat username_dist.html hours_dist.html country_dist.html > report.txt
+#Remove temporary file
+rm concat_dist.html
 
-mv report.txt ..
 
-cd ..
-
-wrap_contents.sh report.txt html_components/summary_plots failed_login_summary.html
-
-rm report.txt
